@@ -1,17 +1,15 @@
 #if LOGGING
 #ifndef LOGGER
 #define LOGGER
-#include <string>
 #include <fstream>
+#include <string>
 
 namespace logger
 {
-    extern const std::string path ;
-    extern std::ofstream out ;
-    void flush() ;
-}
+    extern const std::string path;
+    extern std::ofstream out;
+    void flush();
+} // namespace logger
 
-
-
-#endif 
+#endif
 #endif

@@ -1,6 +1,5 @@
 
 
-
 #ifndef SCS_CFG_HANDLERS_H
 #define SCS_CFG_HANDLERS_H
 
@@ -11,22 +10,22 @@
 #include "scs-telemetry-common.hpp"
 typedef struct scsConfigHandler_s
 {
-	char const *id;
-	void (*handle) (const scs_named_value_t* current, const unsigned int trailer_id);
+    char const *id;
+    void (*handle)(const scs_named_value_t *current, const unsigned int trailer_id);
 } scsConfigHandler_t;
 
 /*  define: scsConfigHandle
-     
+
     Makro of the scs_config event handle functions
     Created with an id and attribute value to create the name `handle##id##attribute`
 
     Parameter:
-   
+
         current - the scs_config event that is handled
-        trailer_id - trailer id if needed to handle the event (0-9)    
- 
+        trailer_id - trailer id if needed to handle the event (0-9)
+
  */
-#define scsConfigHandle(id, attribute) void handle##id##attribute (const scs_named_value_t* current, const unsigned int trailer_id  )
+#define scsConfigHandle(id, attribute) void handle##id##attribute(const scs_named_value_t *current, const unsigned int trailer_id)
 
 // Define prototypes for all the various handlers
 
@@ -34,7 +33,7 @@ typedef struct scsConfigHandler_s
 scsConfigHandle(Substances, Id);
 
 // Controls
-scsConfigHandle(Controls,ShifterType);
+scsConfigHandle(Controls, ShifterType);
 
 // HShifter
 scsConfigHandle(HShifter, SelectorCount);
@@ -97,7 +96,6 @@ scsConfigHandle(Trailer, LicensePlate);
 scsConfigHandle(Trailer, LicensePlateCountry);
 scsConfigHandle(Trailer, LicensePlateCountryId);
 
-
 // Job
 scsConfigHandle(Job, CargoId);
 scsConfigHandle(Job, Cargo);
@@ -119,5 +117,5 @@ scsConfigHandle(Job, UnitCount);
 scsConfigHandle(Job, UnitMass);
 scsConfigHandle(Job, PlannedDistanceKm);
 
-bool handleCfg(const scs_named_value_t* info,const configType type, const unsigned int trailer_id);
+bool handleCfg(const scs_named_value_t *info, const configType type, const unsigned int trailer_id);
 #endif

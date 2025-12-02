@@ -7,14 +7,14 @@
 // - Shared memory map struct layout
 // - [..]
 
-#define PLUGIN_REVID					12
+#define PLUGIN_REVID 12
 
-#define ETS2                            1
-#define ATS                             2
-#define UnknownGame                     0
+#define ETS2 1
+#define ATS 2
+#define UnknownGame 0
 
-#define ETS2_PLUGIN_LOGGING_ON				0
-#define ETS2_PLUGIN_LOGGING_SHAREDMEMORY	0
+#define ETS2_PLUGIN_LOGGING_ON 0
+#define ETS2_PLUGIN_LOGGING_SHAREDMEMORY 0
 #define ETS2_PLUGIN_FILENAME_PREFIX "C:\ets2telem_"
 
 #if ETS2_PLUGIN_LOGGING_ON == 1
@@ -23,52 +23,74 @@
 
 #include "scssdk.h"
 #define SCS_PLUGIN_MMF_NAME TEXT("Local\\SCSTelemetry")
-#define SCS_PLUGIN_MMF_SIZE (32*1024)
+#define SCS_PLUGIN_MMF_SIZE (32 * 1024)
 /**
  * \brief string size for all strings (most of them) the amount of fields in the shared memory field
  */
-#define stringsize  64
+#define stringsize 64
 
- /**
-  * \brief Actual used wheel size of the SDK   not the amount of fields in the shared memory field
-  */
+/**
+ * \brief Actual used wheel size of the SDK   not the amount of fields in the shared memory field
+ */
 #define WHEEL_SIZE 14
 
-  // macro: SUBSTANCE_SIZE
-  // The maximum number of substances that are saved to the memory
+// macro: SUBSTANCE_SIZE
+// The maximum number of substances that are saved to the memory
 #define SUBSTANCE_SIZE 25
 
 bool check_min_version(unsigned const int min_ets2, unsigned const int min_ats);
 bool check_max_version(unsigned const int min_ets2, unsigned const int min_ats);
-enum configType { substances, controls, hshifter, truck, trailer, job };
-enum gameplayType { cancelled, delivered, fined, tollgate, ferry, train };
-void log_line(scs_log_type_t type, const char* text, ...);
-void log_line(const char* text, ...);
+enum configType
+{
+	substances,
+	controls,
+	hshifter,
+	truck,
+	trailer,
+	job
+};
+enum gameplayType
+{
+	cancelled,
+	delivered,
+	fined,
+	tollgate,
+	ferry,
+	train
+};
+void log_line(scs_log_type_t type, const char *text, ...);
+void log_line(const char *text, ...);
 
-typedef struct scsTrailer_s { // Size: 1560
+typedef struct scsTrailer_s
+{ // Size: 1560
 	//----- START OF FIRST ZONE AT OFFSET 0 -----//
-	struct {
+	struct
+	{
 		bool wheelSteerable[16];
 		bool wheelSimulated[16];
 		bool wheelPowered[16];
 		bool wheelLiftable[16];
-	}con_b;
-	struct {
+	} con_b;
+	struct
+	{
 		bool wheelOnGround[16];
 		bool attached;
-	}com_b;
+	} com_b;
 	char buffer_b[3];
 	//----- END OF FIRST ZONE AT OFFSET 83 -----//
 	//----- START OF SECOND ZONE AT OFFSET 84 -----//
-	struct {
+	struct
+	{
 		unsigned int wheelSubstance[16];
-	}com_ui;
-	struct {
+	} com_ui;
+	struct
+	{
 		unsigned int wheelCount;
-	}con_ui;
+	} con_ui;
 	//----- END OF SECOND ZONE AT OFFSET 151 -----//
 	//----- START OF THIRD ZONE AT OFFSET 152 -----//
-	struct {
+	struct
+	{
 		float cargoDamage;
 		float wearChassis;
 		float wearWheels;
@@ -79,13 +101,15 @@ typedef struct scsTrailer_s { // Size: 1560
 		float wheelRotation[16];
 		float wheelLift[16];
 		float wheelLiftOffset[16];
-	}com_f;
-	struct {
+	} com_f;
+	struct
+	{
 		float wheelRadius[16];
-	}con_f;
+	} con_f;
 	//----- END OF THIRD ZONE AT OFFSET 615 -----//
-		//----- START OF 4TH ZONE AT OFFSET 616 -----//
-	struct {
+	//----- START OF 4TH ZONE AT OFFSET 616 -----//
+	struct
+	{
 		float linearVelocityX;
 		float linearVelocityY;
 		float linearVelocityZ;
@@ -98,30 +122,33 @@ typedef struct scsTrailer_s { // Size: 1560
 		float angularAccelerationX;
 		float angularAccelerationY;
 		float angularAccelerationZ;
-	}com_fv;
-	struct {
+	} com_fv;
+	struct
+	{
 		float hookPositionX;
 		float hookPositionY;
 		float hookPositionZ;
 		float wheelPositionX[16];
 		float wheelPositionY[16];
 		float wheelPositionZ[16];
-	}con_fv;
-    char buffer_fv[4];
+	} con_fv;
+	char buffer_fv[4];
 	//----- END OF 4TH ZONE AT OFFSET 871 -----//
-		//----- START OF 5TH ZONE AT OFFSET 872 -----//
-	struct {
+	//----- START OF 5TH ZONE AT OFFSET 872 -----//
+	struct
+	{
 		double worldX;
 		double worldY;
 		double worldZ;
 		double rotationX;
 		double rotationY;
 		double rotationZ;
-	}com_dp;
+	} com_dp;
 
 	//----- END OF 5TH ZONE AT OFFSET 919 -----//
-		//----- START OF 6TH ZONE AT OFFSET 920 -----//
-	struct {
+	//----- START OF 6TH ZONE AT OFFSET 920 -----//
+	struct
+	{
 		char id[stringsize];
 		char cargoAcessoryId[stringsize];
 		char bodyType[stringsize];
@@ -132,19 +159,19 @@ typedef struct scsTrailer_s { // Size: 1560
 		char licensePlate[stringsize];
 		char licensePlateCountry[stringsize];
 		char licensePlateCountryId[stringsize];
-	}con_s;
+	} con_s;
 	//----- END OF 6TH ZONE AT OFFSET 1559 -----//
-}scsTrailer_t;
+} scsTrailer_t;
 
 /**
-   *  \brief Telemetry object
-   *
-   * instead to use a clear object like that in c# we want to create this one easy to parse and modifyable
-   *
-   * Look in the c header of the sdk for more desription or in the c# description
-   *
-   * Arrays must be set here and have all local parameter for their size
-   */
+ *  \brief Telemetry object
+ *
+ * instead to use a clear object like that in c# we want to create this one easy to parse and modifyable
+ *
+ * Look in the c header of the sdk for more desription or in the c# description
+ *
+ * Arrays must be set here and have all local parameter for their size
+ */
 typedef struct scsTelemetryMap_s
 {
 	//----- START OF FIRST ZONE AT OFFSET 0 -----//
@@ -185,13 +212,15 @@ typedef struct scsTelemetryMap_s
 	} scs_values;
 
 	// Contains common unsigned integers
-	struct {
+	struct
+	{
 		// In game time in minutes
 		unsigned int time_abs;
-	}common_ui;
+	} common_ui;
 
 	// Contains config unsigned integers
-	struct {
+	struct
+	{
 		unsigned int gears;
 		unsigned int gears_reverse;
 		unsigned int retarderStepCount;
@@ -201,10 +230,11 @@ typedef struct scsTelemetryMap_s
 		unsigned int maxTrailerCount;
 		unsigned int unitCount;
 		unsigned int plannedDistanceKm;
-	}config_ui;
+	} config_ui;
 
 	// Contains trailer/truck channel unsigned integers
-	struct {
+	struct
+	{
 		unsigned int shifterSlot;
 		unsigned int retarderBrake;
 		unsigned int lightsAuxFront;
@@ -212,32 +242,36 @@ typedef struct scsTelemetryMap_s
 		unsigned int truck_wheelSubstance[16];
 		unsigned int hshifterPosition[32];
 		unsigned int hshifterBitmask[32];
-	}truck_ui;
+	} truck_ui;
 
-	struct {
+	struct
+	{
 		unsigned int jobDeliveredDeliveryTime;
 		unsigned int jobStartingTime;
 		unsigned int jobFinishedTime;
-	}gameplay_ui;
+	} gameplay_ui;
 	char buffer_ui[48];
 	//----- END OF SECOND ZONE AT OFFSET 499 -----//
 
 	//----- START OF Third ZONE AT OFFSET 500 -----//
 	// The third zone contains integers and is sorted in sub structures
 
-	struct {
+	struct
+	{
 		int restStop;
-	}common_i;
+	} common_i;
 
-	struct {
+	struct
+	{
 		int gear;
 		int gearDashboard;
 		int hshifterResulting[32];
-	}truck_i;
+	} truck_i;
 
-	struct {
+	struct
+	{
 		int jobDeliveredEarnedXp;
-	}gameplay_i;
+	} gameplay_i;
 
 	char buffer_i[56];
 	//----- END OF third ZONE AT OFFSET 699 -----//
@@ -245,11 +279,13 @@ typedef struct scsTelemetryMap_s
 	//----- START OF FOURTH ZONE AT OFFSET 700 -----//
 	// The fourth zone contains floats and is sorted in sub structures
 
-	struct {
+	struct
+	{
 		float scale;
-	}common_f;
+	} common_f;
 
-	struct {
+	struct
+	{
 		float fuelCapacity;
 		float fuelWarningFactor;
 		float adblueCapacity;
@@ -266,9 +302,10 @@ typedef struct scsTelemetryMap_s
 		float gearRatiosForward[24];
 		float gearRatiosReverse[8];
 		float unitMass;
-	}config_f;
+	} config_f;
 
-	struct {
+	struct
+	{
 		float speed;
 		float engineRpm;
 		float userSteer;
@@ -306,24 +343,27 @@ typedef struct scsTelemetryMap_s
 		float truck_wheelRotation[16];
 		float truck_wheelLift[16];
 		float truck_wheelLiftOffset[16];
-	}truck_f;
+	} truck_f;
 
-	struct {
+	struct
+	{
 		float jobDeliveredCargoDamage;
 		float jobDeliveredDistanceKm;
 		float refuelAmount;
-	}gameplay_f;
+	} gameplay_f;
 
-	struct {
+	struct
+	{
 		float cargoDamage;
-	}job_f;
+	} job_f;
 	char buffer_f[28];
 	//----- END OF FOURTH ZONE AT OFFSET 1499 -----//
 
 	//----- START OF FIFTH ZONE AT OFFSET 1500 -----//
 	// The fifth zone contains bool and is sorted in sub structures
 
-	struct {
+	struct
+	{
 		bool truckWheelSteerable[16];
 		bool truckWheelSimulated[16];
 		bool truckWheelPowered[16];
@@ -331,9 +371,10 @@ typedef struct scsTelemetryMap_s
 
 		bool isCargoLoaded;
 		bool specialJob;
-	}config_b;
+	} config_b;
 
-	struct {
+	struct
+	{
 		bool parkBrake;
 		bool motorBrake;
 		bool airPressureWarning;
@@ -365,13 +406,13 @@ typedef struct scsTelemetryMap_s
 		bool liftAxleIndicator;
 		bool trailerLiftAxle;
 		bool trailerLiftAxleIndicator;
-	}truck_b;
+	} truck_b;
 
 	struct
 	{
 		bool jobDeliveredAutoparkUsed;
 		bool jobDeliveredAutoloadUsed;
-	}gameplay_b;
+	} gameplay_b;
 
 	char buffer_b[25];
 	//----- END OF FIFTH ZONE AT OFFSET 1639 -----//
@@ -379,7 +420,8 @@ typedef struct scsTelemetryMap_s
 	//----- START OF SIXTH ZONE AT OFFSET 1640 -----//
 	// The sixth zone contains fvector and is sorted in sub structures
 
-	struct {
+	struct
+	{
 		float cabinPositionX;
 		float cabinPositionY;
 		float cabinPositionZ;
@@ -392,8 +434,9 @@ typedef struct scsTelemetryMap_s
 		float truckWheelPositionX[16];
 		float truckWheelPositionY[16];
 		float truckWheelPositionZ[16];
-	}config_fv;
-	struct {
+	} config_fv;
+	struct
+	{
 		float lv_accelerationX;
 		float lv_accelerationY;
 		float lv_accelerationZ;
@@ -412,13 +455,14 @@ typedef struct scsTelemetryMap_s
 		float cabinAAX;
 		float cabinAAY;
 		float cabinAAZ;
-	}truck_fv;
+	} truck_fv;
 	char buffer_fv[60];
 	//----- END OF SIXTH ZONE AT OFFSET 1999 -----//
 
 	//----- START OF 7TH ZONE AT OFFSET 2000 -----//
 	// The 7th zone contains fplacement and is sorted in sub structures
-	struct {
+	struct
+	{
 		float cabinOffsetX;
 		float cabinOffsetY;
 		float cabinOffsetZ;
@@ -431,28 +475,30 @@ typedef struct scsTelemetryMap_s
 		float headOffsetrotationX;
 		float headOffsetrotationY;
 		float headOffsetrotationZ;
-	}truck_fp;
+	} truck_fp;
 	char buffer_fp[152];
 	//----- END OF 7TH ZONE AT OFFSET 2199 -----//
 
 	//----- START OF 8TH ZONE AT OFFSET 2200 -----//
 	// The 8th zone contains dplacement and is sorted in sub structures
 
-	struct {
+	struct
+	{
 		double coordinateX;
 		double coordinateY;
 		double coordinateZ;
 		double rotationX;
 		double rotationY;
 		double rotationZ;
-	}truck_dp;
+	} truck_dp;
 	char buffer_dp[52];
 	//----- END OF 8TH ZONE AT OFFSET 2299 -----//
 
 	//----- START OF 9TH ZONE AT OFFSET 2300 -----//
 	// The 9th zone contains strings and is sorted in sub structures
 
-	struct {
+	struct
+	{
 		char truckBrandId[stringsize];
 		char truckBrand[stringsize];
 		char truckId[stringsize];
@@ -475,8 +521,9 @@ typedef struct scsTelemetryMap_s
 		char truckLicensePlateCountry[stringsize];
 
 		char jobMarket[32];
-	}config_s;
-	struct {
+	} config_s;
+	struct
+	{
 		char fineOffence[32];
 		char ferrySourceName[stringsize];
 		char ferryTargetName[stringsize];
@@ -486,7 +533,7 @@ typedef struct scsTelemetryMap_s
 		char trainTargetName[stringsize];
 		char trainSourceId[stringsize];
 		char trainTargetId[stringsize];
-	}gameplay_s;
+	} gameplay_s;
 
 	char buffer_s[20];
 	//----- END OF 9TH ZONE AT OFFSET 3999 -----//
@@ -494,30 +541,33 @@ typedef struct scsTelemetryMap_s
 	//----- START OF 10TH ZONE AT OFFSET 4000 -----//
 	// The 10th zone contains unsigned long long and is sorted in sub structures
 
-	struct {
+	struct
+	{
 		unsigned long long jobIncome;
-	}config_ull;
+	} config_ull;
 	char buffer_ull[192];
 	//----- END OF 10TH ZONE AT OFFSET 4199 -----//
 
-		//----- START OF 11TH ZONE AT OFFSET 4200 -----//
+	//----- START OF 11TH ZONE AT OFFSET 4200 -----//
 	// The 11th zone contains long long and is sorted in sub structures
 
-	struct {
+	struct
+	{
 		long long jobCancelledPenalty;
 		long long jobDeliveredRevenue;
 		long long fineAmount;
 		long long tollgatePayAmount;
 		long long ferryPayAmount;
 		long long trainPayAmount;
-	}gameplay_ll;
+	} gameplay_ll;
 	char buffer_ll[52];
 	//----- END OF 11TH ZONE AT OFFSET 4299 -----//
 
 	//----- START OF 12TH ZONE AT OFFSET 4300 -----//
 	// The 12th zone contains special events and is sorted in sub structures
 
-	struct {
+	struct
+	{
 		bool onJob;
 		bool jobFinished;
 		bool jobCancelled;
@@ -528,7 +578,7 @@ typedef struct scsTelemetryMap_s
 		bool train;
 		bool refuel;
 		bool refuelPayed;
-	}special_b;
+	} special_b;
 
 	char buffer_special[90];
 	//----- END OF 12TH ZONE AT OFFSET 4399 -----//
@@ -536,16 +586,18 @@ typedef struct scsTelemetryMap_s
 	//----- START OF 13TH ZONE AT OFFSET 4400 -----//
 	// The 13th zone contains substances, place for 25 of them
 
-	struct {
+	struct
+	{
 		char substance[SUBSTANCE_SIZE][stringsize];
-	}substances;
+	} substances;
 	//----- END OF 13TH ZONE AT OFFSET 5999 -----//
 
 	//----- START OF 14TH ZONE AT OFFSET 6000 -----//
 	// The 14th zone contains values of up to 10 trailers (each have a size of 1560)
-	struct {
+	struct
+	{
 		scsTrailer_t trailer[10];
-	}trailer;
+	} trailer;
 
 	//----- END OF 14TH ZONE AT OFFSET 21619 -----//
 } scsTelemetryMap_t;
