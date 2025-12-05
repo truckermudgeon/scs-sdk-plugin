@@ -23,7 +23,7 @@
 
 #include "scssdk.h"
 #ifdef _WIN32
-#define SCS_PLUGIN_MMF_NAME L"Local\\SCSTelemetry"
+#define SCS_PLUGIN_MMF_NAME TEXT("Local\\SCSTelemetry")
 #else
 #define SCS_PLUGIN_MMF_NAME "/SCSTelemetry"
 #endif
