@@ -13,6 +13,7 @@
 #include <cassert>
 #include <cstdarg>
 #include <string>
+#include <cstring>
 // SDK
 #include "amtrucks/scssdk_ats.h"
 #include "amtrucks/scssdk_telemetry_ats.h"
