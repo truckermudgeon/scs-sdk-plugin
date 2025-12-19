@@ -15,7 +15,13 @@ void SharedMemory::LogError(const char *logPtr)
 #endif
 }
 
-SharedMemory::SharedMemory(LPCWSTR newNamePtr, unsigned int size)
+SharedMemory::SharedMemory(
+#ifdef _WIN32
+    LPCWSTR newNamePtr,
+#else
+    const char *newNamePtr,
+#endif
+    unsigned int size)
 {
     this->mapsize = size;
     this->namePtr = newNamePtr;
@@ -24,6 +30,7 @@ SharedMemory::SharedMemory(LPCWSTR newNamePtr, unsigned int size)
     this->logFilePtr = NULL;
 #endif
 
+#ifdef _WIN32
     hMapFile = CreateFileMapping(
         INVALID_HANDLE_VALUE, // use paging file
         nullptr,              // default security
@@ -61,6 +68,31 @@ SharedMemory::SharedMemory(LPCWSTR newNamePtr, unsigned int size)
         LogError("Could not reserve buffer for shared memory");
         CloseHandle(hMapFile);
     }
+#else
+    hMapFile = shm_open(newNamePtr, O_CREAT | O_RDWR, 0600);
+    LogError("Created file map");
+    if (hMapFile == -1)
+    {
+        LogError(("shm_open failed: " + std::to_string(errno)).c_str());
+        return;
+    }
+
+    if (ftruncate(hMapFile, mapsize) == -1)
+    {
+        LogError(("ftruncate failed: " + std::to_string(errno)).c_str());
+        return;
+    }
+
+    this->pBufferPtr = mmap(nullptr, mapsize, PROT_READ | PROT_WRITE, MAP_SHARED, hMapFile, 0);
+    close(hMapFile);
+
+    if (this->pBufferPtr == MAP_FAILED)
+    {
+        LogError(("mmap failed: " + std::to_string(errno)).c_str());
+        close(hMapFile);
+        return;
+    }
+#endif
     else
     {
         memset(this->pBufferPtr, 0, size);
@@ -80,10 +112,17 @@ void SharedMemory::Close()
 #endif
     if (isSharedMemoryHooked)
     {
+#ifdef _WIN32
         if (pBufferPtr != nullptr)
             UnmapViewOfFile(pBufferPtr);
         if (hMapFile != nullptr)
             CloseHandle(hMapFile);
+#else
+        if (pBufferPtr != nullptr)
+            munmap(pBufferPtr, mapsize);
+        if (hMapFile >= 0)
+            shm_unlink(namePtr);
+#endif
     }
 
     isSharedMemoryHooked = false;

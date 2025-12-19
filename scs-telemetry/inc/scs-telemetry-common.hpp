@@ -22,7 +22,11 @@
 #endif
 
 #include "scssdk.h"
+#ifdef _WIN32
 #define SCS_PLUGIN_MMF_NAME TEXT("Local\\SCSTelemetry")
+#else
+#define SCS_PLUGIN_MMF_NAME "/SCSTelemetry"
+#endif
 #define SCS_PLUGIN_MMF_SIZE (32 * 1024)
 /**
  * \brief string size for all strings (most of them) the amount of fields in the shared memory field
