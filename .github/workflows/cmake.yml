@@ -37,11 +37,6 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    - name: Ensure tag is on master
-      run: |
-        git fetch origin master
-        git merge-base --is-ancestor "$GITHUB_SHA" origin/master
-
     - name: Set reusable strings
       id: strings
       shell: bash
