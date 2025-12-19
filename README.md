@@ -10,6 +10,9 @@ This is a fork of RenCloud's [scs-sdk-plugin](https://github.com/RenCloud/scs-sd
 | `UnmapViewOfFile`  | `munmap`      |
 | `CloseHandle`      | `shm_unlink`  |
 
+- On Windows, the name of the file-mapping object is `Local\SCSTelemetry`
+- On macOS and Linux, the name of the shared memory object is `/SCSTelemetry`
+
 The layout of the memory-mapped files is the same across all three OSs[^1], so it's possible to write cross-platform code against this plugin with relatively little effort. See:
 - [`scs-telemetry-common.hpp`](https://github.com/truckermudgeon/scs-sdk-plugin/blob/master/scs-telemetry/inc/scs-telemetry-common.hpp) for the layout of the memory-mapped files
 - [TruckSim-Telemetry](https://github.com/kniffen/TruckSim-Telemetry) for an example of a cross-platform node module that parses the memory-mapped files into JSON
